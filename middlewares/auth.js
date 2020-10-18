@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
     throw new AuthorizationError(
-      'Не заполнен заголовок',
+      'Необходима авторизация. Отсутствует заголовок',
     );
   }
   const token = authorization.replace('Bearer ', '');
