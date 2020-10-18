@@ -13,13 +13,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tva120/express-mesto.git"
+    "url": "git+https://github.com/tva120/react-mesto-api-full.git"
   },
   "keywords": [],
   "bugs": {
-    "url": "https://github.com/tva120/express-mesto/issues"
+    "url": "https://github.com/tva120/react-mesto-api-fullissues"
   },
-  "homepage": "https://github.com/tva120/express-mesto#readme",
+  "homepage": "https://github.com/tva120/react-mesto-api-full#readme",
   "devDependencies": {
     "eslint": "^7.9.0",
     "eslint-config-airbnb-base": "^14.2.0",
