@@ -1,4 +1,34 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const ExistError = require('../errors/ExistError');
+const BadRequestError = require('../errors/BadRequestError');
 const User = require('../models/user');
+
+const { NODE_ENV, JWT_SECRET } = process.env;
+
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        {
+          expiresIn: '7d',
+        },
+      );
+      res
+        .cookie('jwt', token, {
+          maxAge: 604800000,
+          httpOnly: true,
+          sameSite: true,
+        })
+        .send({ message: 'Успешная авторизация' });
+    })
+    .catch(next);
+};
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -21,17 +51,37 @@ module.exports.getUser = (req, res) => {
     });
 };
 
-module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((newUser) => res.status(201).send(newUser))
+module.exports.createUser = (req, res, next) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      email,
+      password: hash,
+      name,
+      avatar,
+      about,
+    }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Некорректные данные!' });
-        return;
+      if (err.name === 'MongoError') {
+        throw new ExistError({ message: `Пользователь с email ${req.body.email} уже существует` });
       }
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
-    });
+      throw new BadRequestError({ message: `Запрос не может быть выполнен: ${err.message}` });
+    })
+    .then((user) => {
+      res.send({
+        data: {
+          _id: user._id,
+          email: user.email,
+          name: user.name ? user.name : undefined,
+          avatar: user.avatar ? user.avatar : undefined,
+          about: user.about ? user.about : undefined,
+        },
+      });
+    })
+    .catch(next);
 };
 
 module.exports.updateProfile = (req, res) => {

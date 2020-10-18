@@ -1,4 +1,6 @@
 const Card = require('../models/card');
+const RightsError = require('../errors/RightsError');
+const NotFoundError = require('../errors/NotFoundError');
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
@@ -27,9 +29,18 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
+  const currentOwner = req.user._id;
   Card.findByIdAndRemove(req.params._id)
     .orFail(new Error('NotFound'))
-    .then((card) => res.send(card))
+    .then((card) => {
+      if (card.owner !== currentOwner) {
+        throw new RightsError({ message: 'Нет прав' });
+      }
+      if (!card) {
+        throw new NotFoundError({ message: `Kарточка ${req.params.id} не найдена` });
+      }
+      res.send(card);
+    })
     .catch((err) => {
       if (err.message === 'NotFound') {
         res.status(404).send({ message: 'Данные не найдены!' });
