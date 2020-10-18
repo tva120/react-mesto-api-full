@@ -1,5 +1,5 @@
 {
-  "name": "express-mesto",
+  "name": "react-mesto-api-full",
   "version": "1.0.0",
   "description": "Server Mesto-react",
   "main": "app.js",
@@ -17,7 +17,7 @@
   },
   "keywords": [],
   "bugs": {
-    "url": "https://github.com/tva120/react-mesto-api-fullissues"
+    "url": "https://github.com/tva120/react-mesto-api-full/issues"
   },
   "homepage": "https://github.com/tva120/react-mesto-api-full#readme",
   "devDependencies": {
