@@ -3,6 +3,9 @@ const jwt = require('jsonwebtoken');
 
 const ExistError = require('../errors/ExistError');
 const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
+const InternalError = require('../errors/InternalError');
+
 const User = require('../models/user');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
@@ -34,7 +37,7 @@ module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send(users))
     .catch(() => {
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
+      throw new InternalError({ message: 'На сервере произошла ошибка!' });
     });
 };
 
@@ -44,10 +47,9 @@ module.exports.getUser = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Данные не найдены!' });
-        return;
+        throw new NotFoundError({ message: 'Данные не найдены!' });
       }
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
+      throw new InternalError({ message: 'На сервере произошла ошибка!' });
     });
 };
 
@@ -91,10 +93,9 @@ module.exports.updateProfile = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Данные не найдены!' });
-        return;
+        throw new NotFoundError({ message: 'Данные не найдены!' });
       }
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
+      throw new InternalError({ message: 'На сервере произошла ошибка!' });
     });
 };
 
@@ -105,9 +106,8 @@ module.exports.updateAvatar = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Данные не найдены!' });
-        return;
+        throw new NotFoundError({ message: 'Данные не найдены!' });
       }
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
+      throw new InternalError({ message: 'На сервере произошла ошибка!' });
     });
 };

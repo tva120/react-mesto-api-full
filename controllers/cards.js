@@ -1,6 +1,8 @@
 const Card = require('../models/card');
 const RightsError = require('../errors/RightsError');
 const NotFoundError = require('../errors/NotFoundError');
+const InternalError = require('../errors/InternalError');
+const BadRequestError = require('../errors/BadRequestError');
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
@@ -8,10 +10,9 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.status(201).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Некорректные данные!' });
-        return;
+        throw new BadRequestError({ message: 'Некорректные данные!' });
       }
-      res.status(500).send({ message: 'На сервере произошла ошибка!' });
+      throw new InternalError({ message: 'На сервере произошла ошибка!' });
     });
 };
 
@@ -21,10 +22,9 @@ module.exports.getCards = (req, res) => {
     .then((cards) => res.send(cards))
     .catch((err) => {
       if (err.name === 'NotFound') {
-        res.status(404).send({ message: 'Данные не найдены!' });
-        return;
+        throw new NotFoundError({ message: 'Данные не найдены!' });
       }
-      res.status(500).send({ message: 'На сервере произошла ошибка!' });
+      throw new InternalError({ message: 'На сервере произошла ошибка!' });
     });
 };
 
@@ -43,10 +43,9 @@ module.exports.deleteCard = (req, res) => {
     })
     .catch((err) => {
       if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Данные не найдены!' });
-        return;
+        throw new NotFoundError({ message: 'Данные не найдены!' });
       }
-      res.status(500).send({ message: 'На сервере произошла ошибка!' });
+      throw new InternalError({ message: 'На сервере произошла ошибка!' });
     });
 };
 
@@ -55,11 +54,13 @@ module.exports.likeCard = (req, res) => {
     .orFail(new Error('NotFound'))
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Данные не найдены!' });
-        return;
+      if (err.message === 'CastError') {
+        throw new BadRequestError({ message: 'Переданы некорректные данные!' });
+      } else if (err.message === 'NotFound') {
+        throw new NotFoundError({ message: 'Данные не найдены!' });
+      } else {
+        throw new InternalError({ message: 'На сервере произошла ошибка!' });
       }
-      res.status(500).send({ message: 'На сервере произошла ошибка!' });
     });
 };
 
@@ -68,10 +69,12 @@ module.exports.dislikeCard = (req, res) => {
     .orFail(new Error('NotFound'))
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Данные не найдены!' });
-        return;
+      if (err.message === 'CastError') {
+        throw new BadRequestError({ message: 'Переданы некорректные данные!' });
+      } else if (err.message === 'NotFound') {
+        throw new NotFoundError({ message: 'Данные не найдены!' });
+      } else {
+        throw new InternalError({ message: 'На сервере произошла ошибка!' });
       }
-      res.status(500).send({ message: 'На сервере произошла ошибка!' });
     });
 };
