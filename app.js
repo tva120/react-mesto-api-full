@@ -28,6 +28,7 @@ const allowedCors = [
   'http://tvaa.students.nomoreparties.xyz',
   'https://www.tvaa.students.nomoreparties.xyz',
   'http://www.tvaa.students.nomoreparties.xyz',
+  'https://api.tvaa.students.nomoreparties.xyz/signup',
   'https://api.tvaa.students.nomoreparties.xyz',
   'http://api.tvaa.students.nomoreparties.xyz',
   'https://api.www.tvaa.students.nomoreparties.xyz',
