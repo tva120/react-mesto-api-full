@@ -23,8 +23,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 
-app.use(cors({ credentials: true, origin: true }));
-
 const allowedCors = [
   'https://tvaa.students.nomoreparties.xyz',
   'http://tvaa.students.nomoreparties.xyz',
@@ -37,15 +35,23 @@ const allowedCors = [
   'localhost:3000',
 ];
 
-app.use((req, res, next) => {
-  const { origin } = req.headers;
+const corsOptions = {
+  origin(origin, callback) {
+    if (allowedCors.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+};
+app.use(cors(corsOptions));
 
-  if (allowedCors.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
-
-  next();
-});
+app.options('*', cors({
+  origin: true,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credential: true,
+  optionsSuccessStatus: 204,
+}));
 
 app.use(requestLogger);
 
