@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const { celebrate, Joi, errors } = require('celebrate');
 const userRouter = require('./routes/users.js');
 const cardRouter = require('./routes/cards.js');
@@ -21,6 +22,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
   useUnifiedTopology: true,
 });
+
+app.use(cors({ credentials: true, origin: true }));
 
 const allowedCors = [
   'https://tvaa.students.nomoreparties.xyz',
