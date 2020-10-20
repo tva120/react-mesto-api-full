@@ -13,7 +13,7 @@ https://tva120.github.io/react-mesto-api-full/
 front:
 https://tvaa.students.nomoreparties.xyz/
 api:
-https://tvaa.students.nomoreparties.xyz/
+https://api.tvaa.students.nomoreparties.xyz/
 ip:
 130.193.58.15
 
