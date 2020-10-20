@@ -62,11 +62,18 @@ module.exports.getUserMe = (req, res, next) => {
 
 module.exports.createUser = (req, res, next) => {
   const {
-    email, password,
+    name = 'Жак-Ив Кусто',
+    about = 'Исследователь океана',
+    avatar = 'https://kaskad.tv/images/2020/foto_zhak_iv_kusto__-_interesnie_fakti_20190810_2078596433.jpg',
+    email,
+    password,
   } = req.body;
 
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
+      name,
+      about,
+      avatar,
       email,
       password: hash,
     }))
