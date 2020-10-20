@@ -10,8 +10,12 @@ https://tva120.github.io/react-mesto-api-full/
 * Yandex.Cloud
 * Backend
 
+front:
 https://tvaa.students.nomoreparties.xyz/
-
+api:
+https://tvaa.students.nomoreparties.xyz/
+ip:
+130.193.58.15
 
 ### 2020 Вадим Трошков
 
