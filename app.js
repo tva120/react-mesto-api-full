@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const helmet = require('helmet');
 const cors = require('cors');
 const { celebrate, Joi, errors } = require('celebrate');
 const userRouter = require('./routes/users.js');
@@ -23,17 +24,21 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 
+app.use(helmet());
+app.use(requestLogger);
 const allowedCors = [
   'https://tvaa.students.nomoreparties.xyz',
   'http://tvaa.students.nomoreparties.xyz',
   'https://www.tvaa.students.nomoreparties.xyz',
   'http://www.tvaa.students.nomoreparties.xyz',
-  'https://api.tvaa.students.nomoreparties.xyz/signup',
   'https://api.tvaa.students.nomoreparties.xyz',
   'http://api.tvaa.students.nomoreparties.xyz',
   'https://api.www.tvaa.students.nomoreparties.xyz',
   'http://api.www.tvaa.students.nomoreparties.xyz',
-  'localhost:3000',
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost',
+  undefined,
 ];
 
 const corsOptions = {
@@ -41,7 +46,7 @@ const corsOptions = {
     if (allowedCors.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error(`Ошибка CORS ${origin}`));
     }
   },
 };
@@ -53,8 +58,6 @@ app.options('*', cors({
   credential: true,
   optionsSuccessStatus: 204,
 }));
-
-app.use(requestLogger);
 
 app.get('/crash-test', () => {
   setTimeout(() => {
@@ -73,9 +76,6 @@ app.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required().min(6).max(30),
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string(),
   }),
 }), createUser);
 

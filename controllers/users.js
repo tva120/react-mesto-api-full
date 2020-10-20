@@ -28,7 +28,7 @@ module.exports.login = (req, res, next) => {
           httpOnly: true,
           sameSite: true,
         })
-        .send({ message: 'Успешная авторизация' });
+        .send({ message: 'Успешно!' });
     })
     .catch(next);
 };
@@ -53,18 +53,22 @@ module.exports.getUser = (req, res) => {
     });
 };
 
+module.exports.getUserMe = (req, res, next) => {
+  User.findOne({ _id: req.user._id })
+    .orFail(new NotFoundError('Нет пользователя с таким id'))
+    .then((user) => res.send(user))
+    .catch(next);
+};
+
 module.exports.createUser = (req, res, next) => {
   const {
-    name, about, avatar, email, password,
+    email, password,
   } = req.body;
 
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       email,
       password: hash,
-      name,
-      avatar,
-      about,
     }))
     .catch((err) => {
       if (err.name === 'MongoError') {

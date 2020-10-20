@@ -1,10 +1,11 @@
 const users = require('express').Router();
 const { celebrate, Joi, errors } = require('celebrate');
 const {
-  getUsers, getUser, updateProfile, updateAvatar,
+  getUsers, getUser, getUserMe, updateProfile, updateAvatar,
 } = require('../controllers/users');
 
 users.get('/', getUsers);
+users.get('/me', getUserMe);
 
 users.get('/:_id', celebrate({
   body: Joi.object().keys({

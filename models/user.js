@@ -8,17 +8,17 @@ const userSchema = new mongoose.Schema({
     type: String,
     minlength: 2,
     maxlength: 30,
-    required: true,
+    required: false,
   },
   about: {
     type: String,
     minlength: 2,
     maxlength: 30,
-    required: true,
+    required: false,
   },
   avatar: {
     type: String,
-    required: true,
+    required: false,
     validate: {
       validator: (url) => validate(url),
       message: (props) => `${props.value} - некорректная ссылка`,
