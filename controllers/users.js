@@ -41,15 +41,21 @@ module.exports.getUsers = (req, res) => {
     });
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   User.findById(req.params._id)
-    .orFail(new Error('NotFound'))
-    .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.message === 'NotFound') {
-        throw new NotFoundError({ message: 'Данные не найдены!' });
+    .orFail(new NotFoundError('Данные не найдены!'))
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Данные не найдены!');
       }
-      throw new InternalError({ message: 'На сервере произошла ошибка!' });
+      res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'Error') {
+        next(new NotFoundError('Данные не найдены!'));
+      } else {
+        next(err);
+      }
     });
 };
 
@@ -62,9 +68,9 @@ module.exports.getUserMe = (req, res, next) => {
 
 module.exports.createUser = (req, res, next) => {
   const {
-    name = 'Жак-Ив Кусто',
-    about = 'Исследователь океана',
-    avatar = 'https://kaskad.tv/images/2020/foto_zhak_iv_kusto__-_interesnie_fakti_20190810_2078596433.jpg',
+    name,
+    about,
+    avatar,
     email,
     password,
   } = req.body;
@@ -80,6 +86,9 @@ module.exports.createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'MongoError') {
         throw new ExistError({ message: `Пользователь с email ${req.body.email} уже существует` });
+      }
+      if (err.name === 'ValidationError') {
+        throw new BadRequestError({ message: `Валидация ${req.body.email} не пройдена` });
       }
       throw new BadRequestError({ message: `Запрос не может быть выполнен: ${err.message}` });
     })

@@ -74,8 +74,11 @@ app.post('/signin', celebrate({
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().max(30),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().required().uri(),
+    email: Joi.string().required().email().trim(true),
+    password: Joi.string().required().trim(true),
   }),
 }), createUser);
 
@@ -93,11 +96,12 @@ app.use(errorLogger);
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
+  const { status = 500, message } = err;
+
   return res
-    .status(statusCode)
+    .status(status)
     .send({
-      message: statusCode === 500
+      message: status === 500
         ? 'Внутренняя ошибка'
         : message,
     });
