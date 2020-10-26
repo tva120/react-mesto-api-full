@@ -36,6 +36,7 @@ const allowedCors = [
   'http://api.tvaa.students.nomoreparties.xyz',
   'https://api.www.tvaa.students.nomoreparties.xyz',
   'http://api.www.tvaa.students.nomoreparties.xyz',
+  undefined,
 ];
 
 const corsOptions = {
