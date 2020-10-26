@@ -35,23 +35,29 @@ module.exports.deleteCard = (req, res, next) => {
       if (card === null) {
         throw new NotFoundError('Данные не найдены!');
       }
-      if (card.owner.toString() !== currentOwner) {
+      if (card.owner.toString() === currentOwner) {
+        Card.findByIdAndRemove(req.params._id)
+          .then((item) => {
+            if (!item) {
+              throw new NotFoundError(`Kарточка ${req.params._id} не найдена`);
+            }
+            res.send(card);
+          });
+      } else {
         throw new RightsError('Нет прав');
       }
-
-      Card.findByIdAndRemove(req.params._id)
-        .then((item) => {
-          if (!item) {
-            throw new NotFoundError(`Kарточка ${req.params.id} не найдена`);
-          }
-          res.send(card);
-        });
     })
     .catch((err) => {
-      if (err.name === 'Error') {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Переданы некорректные данные!'));
+      } else if (err.name === 'NotFound') {
         next(new NotFoundError('Данные не найдены!'));
+      } else if (err.name === 'Error') {
+        next(new BadRequestError(err.message));
+      } else if (err.name === 'TypeError') {
+        next(new BadRequestError(err.message));
       } else {
-        next(err);
+        next(new InternalError('На сервере произошла ошибка!'));
       }
     });
 };
@@ -66,12 +72,14 @@ module.exports.likeCard = (req, res, next) => {
       res.send(card);
     })
     .catch((err) => {
-      if (err.message === 'CastError') {
-        next(new BadRequestError({ message: 'Переданы некорректные данные!' }));
-      } else if (err.message === 'NotFound') {
-        next(new NotFoundError({ message: 'Данные не найдены!' }));
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Переданы некорректные данные!'));
+      } else if (err.name === 'NotFound') {
+        next(new NotFoundError('Данные не найдены!'));
+      } else if (err.name === 'Error') {
+        next(new NotFoundError('Данные не найдены!'));
       } else {
-        next(new InternalError({ message: 'На сервере произошла ошибка!' }));
+        next(new InternalError('На сервере произошла ошибка!'));
       }
     });
 };
@@ -81,12 +89,14 @@ module.exports.dislikeCard = (req, res, next) => {
     .orFail(new Error('NotFound'))
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.message === 'CastError') {
-        next(new BadRequestError({ message: 'Переданы некорректные данные!' }));
-      } else if (err.message === 'NotFound') {
-        next(new NotFoundError({ message: 'Данные не найдены!' }));
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Переданы некорректные данные!'));
+      } else if (err.name === 'NotFound') {
+        next(new NotFoundError('Данные не найдены!'));
+      } else if (err.name === 'Error') {
+        next(new NotFoundError('Данные не найдены!'));
       } else {
-        next(new InternalError({ message: 'На сервере произошла ошибка!' }));
+        next(new InternalError('На сервере произошла ошибка!'));
       }
     });
 };

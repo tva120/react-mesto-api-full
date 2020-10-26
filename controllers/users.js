@@ -51,7 +51,9 @@ module.exports.getUser = (req, res, next) => {
       res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'Error') {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Некорректные данные!'));
+      } else if (err.name === 'Error') {
         next(new NotFoundError('Данные не найдены!'));
       } else {
         next(err);
@@ -84,7 +86,7 @@ module.exports.createUser = (req, res, next) => {
       password: hash,
     }))
     .catch((err) => {
-      if (err.name === 'MongoError') {
+      if (err.name === 'MongoError' && err.code === 11000) {
         throw new ExistError({ message: `Пользователь с email ${req.body.email} уже существует` });
       }
       if (err.name === 'ValidationError') {
