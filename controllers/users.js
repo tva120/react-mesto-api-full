@@ -28,8 +28,9 @@ module.exports.login = (req, res, next) => {
           httpOnly: true,
           sameSite: true,
         })
-        .send({ message: 'Успешно!' });
+        .send({ message: 'Успешно!', token: `${token}` });
     })
+
     .catch(next);
 };
 
@@ -111,7 +112,7 @@ module.exports.createUser = (req, res, next) => {
 module.exports.updateProfile = (req, res) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
-    .orFail(new Error('NotFound'))
+    .orFail(new NotFoundError('NotFound'))
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.message === 'NotFound') {
@@ -124,7 +125,7 @@ module.exports.updateProfile = (req, res) => {
 module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
-    .orFail(new Error('NotFound'))
+    .orFail(new NotFoundError('NotFound'))
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.message === 'NotFound') {

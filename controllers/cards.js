@@ -18,7 +18,7 @@ module.exports.createCard = (req, res) => {
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .orFail(new Error('NotFound'))
+    .orFail(new NotFoundError('NotFound'))
     .then((cards) => res.send(cards))
     .catch((err) => {
       if (err.name === 'NotFound') {
@@ -64,7 +64,7 @@ module.exports.deleteCard = (req, res, next) => {
 
 module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params._id, { $addToSet: { likes: req.user._id } }, { new: true })
-    .orFail(new Error('NotFound'))
+    .orFail(new NotFoundError('NotFound'))
     .then((card) => {
       if (card === null) {
         throw new NotFoundError('Данные не найдены!');
@@ -86,7 +86,7 @@ module.exports.likeCard = (req, res, next) => {
 
 module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params._id, { $pull: { likes: req.user._id } }, { new: true })
-    .orFail(new Error('NotFound'))
+    .orFail(new NotFoundError('NotFound'))
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {

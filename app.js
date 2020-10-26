@@ -10,6 +10,7 @@ const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const NotFoundError = require('./errors/NotFoundError');
+const InternalError = require('./errors/InternalError');
 
 const { PORT = 3001 } = process.env;
 const app = express();
@@ -46,7 +47,7 @@ const corsOptions = {
     if (allowedCors.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      callback(new Error(`Ошибка CORS ${origin}`));
+      callback(new NotFoundError(`Ошибка CORS ${origin}`));
     }
   },
 };
@@ -61,7 +62,7 @@ app.options('*', cors({
 
 app.get('/crash-test', () => {
   setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
+    throw new InternalError('Сервер сейчас упадёт');
   }, 0);
 });
 
@@ -97,7 +98,6 @@ app.use(errorLogger);
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   const { status = 500, message } = err;
-
   return res
     .status(status)
     .send({
