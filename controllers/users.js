@@ -38,7 +38,7 @@ module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send(users))
     .catch(() => {
-      throw new InternalError({ message: 'На сервере произошла ошибка!' });
+      throw new InternalError('На сервере произошла ошибка!');
     });
 };
 
@@ -88,12 +88,12 @@ module.exports.createUser = (req, res, next) => {
     }))
     .catch((err) => {
       if (err.name === 'MongoError' && err.code === 11000) {
-        throw new ExistError({ message: `Пользователь с email ${req.body.email} уже существует` });
+        throw new ExistError(`Пользователь с email ${req.body.email} уже существует`);
       }
       if (err.name === 'ValidationError') {
-        throw new BadRequestError({ message: `Валидация ${req.body.email} не пройдена` });
+        throw new BadRequestError(`Валидация ${req.body.email} не пройдена`);
       }
-      throw new BadRequestError({ message: `Запрос не может быть выполнен: ${err.message}` });
+      throw new BadRequestError(`Запрос не может быть выполнен: ${err.message}`);
     })
     .then((user) => {
       res.send({
@@ -116,9 +116,9 @@ module.exports.updateProfile = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.message === 'NotFound') {
-        throw new NotFoundError({ message: 'Данные не найдены!' });
+        throw new NotFoundError('Данные не найдены!');
       }
-      throw new InternalError({ message: 'На сервере произошла ошибка!' });
+      throw new InternalError('На сервере произошла ошибка!');
     });
 };
 
@@ -129,8 +129,8 @@ module.exports.updateAvatar = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.message === 'NotFound') {
-        throw new NotFoundError({ message: 'Данные не найдены!' });
+        throw new NotFoundError('Данные не найдены!');
       }
-      throw new InternalError({ message: 'На сервере произошла ошибка!' });
+      throw new InternalError('На сервере произошла ошибка!');
     });
 };

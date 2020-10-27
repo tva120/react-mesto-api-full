@@ -10,9 +10,9 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.status(201).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError({ message: 'Некорректные данные!' });
+        throw new BadRequestError('Некорректные данные!');
       }
-      throw new InternalError({ message: 'На сервере произошла ошибка!' });
+      throw new InternalError('На сервере произошла ошибка!');
     });
 };
 
@@ -22,9 +22,9 @@ module.exports.getCards = (req, res) => {
     .then((cards) => res.send(cards))
     .catch((err) => {
       if (err.name === 'NotFound') {
-        throw new NotFoundError({ message: 'Данные не найдены!' });
+        throw new NotFoundError('Данные не найдены!');
       }
-      throw new InternalError({ message: 'На сервере произошла ошибка!' });
+      throw new InternalError('На сервере произошла ошибка!');
     });
 };
 
@@ -49,13 +49,16 @@ module.exports.deleteCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные!'));
+        next(new BadRequestError(err.message));
       } else if (err.name === 'NotFound') {
         next(new NotFoundError('Данные не найдены!'));
       } else if (err.name === 'Error') {
-        next(new BadRequestError(err.message));
+        if (err.status === 403) {
+          next(err);
+        }
+        next(new NotFoundError(err.message));
       } else if (err.name === 'TypeError') {
-        next(new BadRequestError(err.message));
+        next(new NotFoundError(err.message));
       } else {
         next(new InternalError('На сервере произошла ошибка!'));
       }
